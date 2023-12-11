@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 var express_1 = __importDefault(require("express"));
 var index_1 = __importDefault(require("./routes/index"));
+var debug_1 = require("debug");
 var app = (0, express_1.default)();
 exports.app = app;
 var port = 3000;
@@ -13,8 +14,8 @@ var port = 3000;
 app.get('/', function (req, res) {
     res.send('Hello There');
 });
-//Start API Route to api folder
+// Start API Route to api folder
 app.use('/api', index_1.default);
 app.listen(port, function () {
-    console.log("Listening on port http://localhost:".concat(port));
+    (0, debug_1.log)("Listening on port http://localhost:".concat(port));
 });

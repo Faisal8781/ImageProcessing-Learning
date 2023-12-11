@@ -39,55 +39,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var fs_1 = require("fs");
-var path_1 = __importDefault(require("path"));
-var imageProcessing_1 = __importDefault(require("../utilities/imageProcessing"));
-var checkInput_1 = __importDefault(require("../utilities/checkInput"));
-var convertToNumber_1 = __importDefault(require("../utilities/convertToNumber"));
-var routes = express_1.default.Router();
-// resolve the path to be able to display it in the page
-var output = path_1.default.resolve('src/thump/output.jpg');
-// Create a cache to store processed images
-var imageCache = new Map();
-routes.get('/', function (req, res) {
-    res.send('Welcome To Main API Page');
-});
-// The image processing function
-routes.get('/images', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, width, height, filename, _b, parsedWidth, parsedHeight, cacheKey, cachedImage, data, err_1;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                _a = req.query, width = _a.width, height = _a.height, filename = _a.filename;
-                _b = (0, convertToNumber_1.default)(width, height), parsedWidth = _b[0], parsedHeight = _b[1];
-                cacheKey = "".concat(parsedWidth, "-").concat(parsedHeight, "-").concat(filename);
-                if (!imageCache.has(cacheKey)) return [3 /*break*/, 1];
-                cachedImage = imageCache.get(cacheKey);
-                res.sendFile(cachedImage);
-                return [3 /*break*/, 7];
-            case 1:
-                _c.trys.push([1, 6, , 7]);
-                return [4 /*yield*/, fs_1.promises.readFile("src/images/".concat(filename, ".jpg"))];
-            case 2:
-                data = _c.sent();
-                if (!(0, checkInput_1.default)(parsedWidth, parsedHeight)) return [3 /*break*/, 3];
-                res.send('Invlid Input Please inter positive number only');
-                return [3 /*break*/, 5];
-            case 3: return [4 /*yield*/, (0, imageProcessing_1.default)(data, parsedWidth, parsedHeight, output, imageCache, cacheKey)];
-            case 4:
-                // ImageProcessing Function
-                if (_c.sent()) {
-                    res.sendFile(output);
-                }
-                _c.label = 5;
-            case 5: return [3 /*break*/, 7];
-            case 6:
-                err_1 = _c.sent();
-                console.error(err_1);
-                return [3 /*break*/, 7];
-            case 7: return [2 /*return*/];
-        }
+var sharp_1 = __importDefault(require("sharp"));
+// ImageProcessing Function and set Cache
+function imageProcessings(file, width, height, output, imageCache, cacheKey) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    (0, sharp_1.default)(file)
+                        .resize(width, height)
+                        .toFile(output, function (err, info) {
+                        if (err) {
+                            reject(err);
+                        }
+                        else {
+                            imageCache.set(cacheKey, output);
+                            resolve(true);
+                        }
+                    });
+                })];
+        });
     });
-}); });
-exports.default = routes;
+}
+exports.default = imageProcessings;

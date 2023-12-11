@@ -41,6 +41,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../index");
 var supertest_1 = __importDefault(require("supertest"));
+var imageProcessing_1 = __importDefault(require("../utilities/imageProcessing"));
+var fs_1 = require("fs");
+var path_1 = __importDefault(require("path"));
+var convertToNumber_1 = __importDefault(require("../utilities/convertToNumber"));
+var checkInput_1 = __importDefault(require("../utilities/checkInput"));
 describe('testing Endpoint /api and /api/images?filename:****&width=000&height=000', function () {
     it('should return 200 status code', function () { return __awaiter(void 0, void 0, void 0, function () {
         var response;
@@ -98,6 +103,66 @@ describe('Image Incorrect input parameters type test..', function () {
                     expect(response.error);
                     return [2 /*return*/];
             }
+        });
+    }); });
+});
+describe('testing Endpoint / ', function () {
+    it('should return 200 status code', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, supertest_1.default)(index_1.app).get('/')];
+                case 1:
+                    response = _a.sent();
+                    expect(response.status).toBe(200);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('Testing ImageProcessing Module ', function () {
+    it('should return true so the imageProcessing function resolved', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var filename, data, width, height, imageCache, output, cacheKey, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    filename = 'fjord';
+                    return [4 /*yield*/, fs_1.promises.readFile("src/images/".concat(filename, ".jpg"))];
+                case 1:
+                    data = _b.sent();
+                    width = 200;
+                    height = 200;
+                    imageCache = new Map();
+                    output = path_1.default.resolve('src/thump/output.jpg');
+                    cacheKey = "".concat(width, "-").concat(height, "-").concat(filename);
+                    _a = expect;
+                    return [4 /*yield*/, (0, imageProcessing_1.default)(data, width, height, output, imageCache, cacheKey)];
+                case 2:
+                    _a.apply(void 0, [_b.sent()]).toBeTrue();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('Convert String to Number ', function () {
+    it('should return true that 200 width and 200 height now are count as number', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var width, height;
+        return __generator(this, function (_a) {
+            width = '200';
+            height = '200';
+            expect((0, convertToNumber_1.default)(width, height)).toEqual([200, 200]);
+            return [2 /*return*/];
+        });
+    }); });
+});
+describe('Check if height and width are number and above 0 ', function () {
+    it('should return true that 200 width and 200 height now are count as number', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var width, height;
+        return __generator(this, function (_a) {
+            width = 200;
+            height = 200;
+            expect((0, checkInput_1.default)(width, height)).not.toBeTrue();
+            return [2 /*return*/];
         });
     }); });
 });
